@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://cdn.abacus.ai/images/f1ffab09-701e-49f8-838e-e3fa28bdc5f3.png" alt="AirSenSys" width="100%">
+</p>
+
 # AirSenSys
 
 Mobile air-quality sensor node for city-scale, crowdsourced particulate monitoring.
