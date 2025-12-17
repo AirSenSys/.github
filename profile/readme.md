@@ -8,23 +8,31 @@ Mobile air-quality sensor node for city-scale, crowdsourced particulate monitori
 
 ## Introduction
 
-AirSenSys is a mobile air-quality sensing node built on the LilyGO T-SIM7000G, designed to generate dense spatiotemporal particulate matter (PM) datasets across a city. In the (fictional) deployment scenario, units are mounted on Vienna’s public bicycles. A small hub dynamo powers each node while riding, with an onboard battery buffering energy during stops and low-speed periods. As riders move through the city, the system continuously samples PM via the Sensirion SPS30, tags each reading with GNSS time and location, and transmits compact oneM2M-formatted data over LTE Cat-M (with 2G fallback). Temperature measurement is optional for added environmental context.
+AirSenSys is a mobile air-quality sensing node built on the LilyGO T-SIM7000G, designed to generate dense spatiotemporal particulate matter (PM) datasets across a city. In the (fictional) deployment scenario, units are mounted on Vienna’s public bicycles. A small hub dynamo powers each node while riding, with an onboard battery buffering energy during stops and low-speed periods. As riders move through the city, the system continuously samples PM via the Sensirion SPS30, tags each reading with GNSS time and location, and transmits compact data over LTE Cat-M (with 2G fallback). Temperature measurement is optional for added environmental context.
 
 This project description captures the introductory quarter of the overall exposé, setting the scene before deeper sections on firmware state machine, oneM2M resource hierarchy, power budgeting, backend ingestion, and validation.
+## System Overview
+
+Each sensor node:
+- Measures particulate matter using an SPS30 sensor
+- Determines its position via GNSS
+- Communicates over LTE/GPRS using a cellular modem
+- Periodically sends telemetry to a backend ingestion endpoint
+- Is provisioned once to obtain credentials and ingestion configuration
+
+The backend:
+- Provisions devices via Node-RED
+- Registers devices in ThingsBoard
+- Stores device metadata in PostgreSQL
+- Acts as the secure ingress point for all telemetry data
 
 ## What It Measures
 
 - Mandatory: PM2.5, PM10 (via Sensirion SPS30)
-- Optional: Temperature
 - Context: GNSS timestamp and coordinates; basic network signal info (for diagnostics)
 
-## oneM2M Alignment
 
-- Resource model: An Application Entity (AE) publishes measurements as contentInstances under a container.
-- Payload: JSON content with `cnf` (contentInfo) and `con` (content) fields.
-- Transport: Uplink over LTE Cat-M with automatic 2G fallback; compact payloads to minimize power and cost.
-
-### Example oneM2M contentInstance (request body)
+### Telemetry Format
 
 ```json
 {
@@ -51,3 +59,33 @@ This project description captures the introductory quarter of the overall expos�
     }
   }
 }
+
+## Provisioning Endpoint
+
+New devices are provisioned via an HTTP POST request:
+```json
+POST /provisioning
+
+Expected JSON payload:
+```json
+{
+  "sensor": "SPS30",
+  "fw": "0.3.1"
+}
+
+## Backend Architecture
+
+# Node-RED
+
+- Handles provisioning
+- Validates incoming data
+- Acts as telemetry ingress
+
+# PostgreSQL
+- Stores sensor metadata and tokens
+
+# ThingsBoard
+
+- Used for visualization and device management
+- Receives data only via backend services
+![Dash](Thingsboard/district-dashboard.png)
