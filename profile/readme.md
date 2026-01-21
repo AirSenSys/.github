@@ -17,7 +17,7 @@ For detailed information about each component, please refer to the README in eac
 
 - **Mandatory**: PM2.5, PM10 (via Sensirion SPS30)
 - **Optional**: Temperature
-- **Context**:  GNSS timestamp and coordinates; basic network signal info (for diagnostics)
+- **Context**:  GNSS coordinates; basic network signal info (for diagnostics), Network-Timestamp, Dynamo Voltage and Battery Voltage
 
 ## System Architecture
 
